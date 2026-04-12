@@ -1,0 +1,25 @@
+redis:
+  addr: "localhost:6379"
+
+server:
+  addr: ":8080"
+
+rules:
+  - name: default
+    limit: 100
+    window: 60s
+    key_source: ip
+
+  - name: api_heavy
+    match:
+      path_prefix: /api/v1/search
+    limit: 10
+    window: 60s
+    key_source: "header:X-API-Key"
+
+  - name: auth
+    match:
+      path_prefix: /auth/login
+    limit: 5
+    window: 300s
+    key_source: ip
