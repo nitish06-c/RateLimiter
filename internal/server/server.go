@@ -9,6 +9,7 @@ import (
 	"github.com/nitish/ratelimiter/internal/config"
 	"github.com/nitish/ratelimiter/internal/limiter"
 	"github.com/nitish/ratelimiter/internal/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Server struct {
@@ -18,6 +19,7 @@ type Server struct {
 func New(addr string, lim limiter.Limiter, cfg *config.Config) *Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", handleHealth)
+	mux.Handle("/metrics", promhttp.Handler())
 	mux.HandleFunc("/", handleEcho)
 
 	return &Server{

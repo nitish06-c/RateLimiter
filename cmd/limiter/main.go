@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/nitish/ratelimiter/internal/config"
+	"github.com/nitish/ratelimiter/internal/metrics"
 	redislimiter "github.com/nitish/ratelimiter/internal/redis"
 	"github.com/nitish/ratelimiter/internal/server"
 	"github.com/redis/go-redis/v9"
@@ -40,7 +41,9 @@ func main() {
 	}
 	log.Printf("INFO: redis connected addr=%s", cfg.Redis.Addr)
 
-	lim := redislimiter.NewSlidingWindowLimiter(redisClient, "rl")
+	lim := metrics.NewInstrumentedLimiter(
+		redislimiter.NewSlidingWindowLimiter(redisClient, "rl"),
+	)
 
 	srv := server.New(cfg.Server.Addr, lim, cfg)
 
